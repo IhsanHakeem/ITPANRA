@@ -1,0 +1,13 @@
+$users=Get-BrokerSession -MaxRecordCount 5 | select -Property ReceiverIPAddress,UserUPN, UserFullName, city 
+$users | Export-Csv C:\test4.CSV
+$users | Export-Clixml C:\new.xml
+$Tab = [char]9
+
+$ipaddresses=$users.ReceiverIPAddress
+$done=foreach ($user in $users){
+$ipaddress=$user.ReceiverIPAddress
+$resource= "https://tools.keycdn.com/geo.json?host=$ipaddress"
+$geoip=Invoke-RestMethod -Method Get -URI $resource
+$geoip.data.geo.city+"$tab"+ $geoip.data.geo.ip+"$tab"+$geoip.data.geo.postal_code+"$tab"+$user.UserFullName 
+}
+$done | set-Content C:\test2.txt
